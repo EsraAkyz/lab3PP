@@ -14,6 +14,7 @@ enum class EncryptionStep {
 class Algorithm {
 public: 
 	using EncryptionScheme = std::array<EncryptionStep, 16>;
+	using bit = std::array<int, 64>;
 
 	// task 1 b)
 	[[nodiscard]] std::uint64_t encode(EncryptionScheme encryptionScheme);

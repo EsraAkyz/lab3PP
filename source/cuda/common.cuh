@@ -31,3 +31,9 @@ __device__ T1 atomicAdd(T1* x, T1 y);
 #define FLAT_HASH_SHARED_MEM 0
 #define FIND_HASH_SHARED_MEM 0
 #define HASH_SCHEMES_SHARED_MEM 0
+
+// task 2 a)
+
+[[nodiscard]] unsigned int divup(unsigned int numThreads, unsigned int threadsPerBlock){                       // ohne class? in .cuh implementieren?
+	return numThreads / threadsPerBlock;
+}
