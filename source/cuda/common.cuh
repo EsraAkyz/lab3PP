@@ -19,7 +19,7 @@
 #endif
 
 #if defined (__INTELLISENSE__) | defined (__RESHARPER__)
-// Hier können diverse Funktionsdeklarationen eingefügt werden, die der NVCC kennt, der Host-Compiler aber nicht.
+// Hier kÃ¶nnen diverse Funktionsdeklarationen eingefÃ¼gt werden, die der NVCC kennt, der Host-Compiler aber nicht.
 // Wenn die in CUDA-Kerneln aufgerufen werden, zeigt sonst die IDE einen Fehler an.
 // Hier beispielsweise mit atomicAdd, vergleiche https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#arithmetic-functions
 template<class T1>
@@ -33,7 +33,8 @@ __device__ T1 atomicAdd(T1* x, T1 y);
 #define HASH_SCHEMES_SHARED_MEM 0
 
 // task 2 a)
-
-[[nodiscard]] unsigned int divup(unsigned int numThreads, unsigned int threadsPerBlock){                       // ohne class? in .cuh implementieren?
-	return numThreads / threadsPerBlock;
+/** divup function **/
+__host__ __device__
+[[nodiscard]] unsigned int divup(unsigned int n, unsigned int d){
+    return (n + d - 1)/d;
 }
