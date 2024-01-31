@@ -2,99 +2,80 @@
 #include "FES.h"
 
 // task 1 b)
-[[nodiscard]] std::uint64_t encode(Algorithm::EncryptionScheme encryptionScheme) {
+/** encode function **/
+std::uint64_t encode (const EncryptionScheme& scheme) {
+    std::uint64_t result = 0;
 
-	auto first = 0;
-	auto second = 0; 
-	std::uint64_t result; 
-	std::vector<int> values;
-	auto newArray = Algorithm::bit{};
+    // Loop through each step in the scheme
+    for (auto i=0; i<scheme.size(); i++){
+        // Translate EncryptionStep into bits
+        std::uint64_t bits;
+        switch (scheme[i]) {
+            case E: bits = 0b00; break;
+            case D: bits = 0b01; break;
+            case K: bits = 0b10; break;
+            case T: bits = 0b11; break;
+            default: bits = 0; // Handle potential errors
+        }
+        // Arrange bits in std::uint64_t
+        result |= (bits << (i * 2));
+    }
 
-	for (auto i = 0; i < 31; i=i+2) {
-		if (encryptionScheme[i] == EncryptionStep::E) {
-			first = 0;
-			second = 0;
-		}
-		if (encryptionScheme[i] == EncryptionStep::D) {
-			first = 0;
-			second = 1;
-		}
-		if (encryptionScheme[i] == EncryptionStep::K) {
-			first = 1;
-			second = 0;
-		}
-		else {
-			first = 1;
-			second = 1;
-		}
+    // Replicate the 32 lower bits into the 32 upper bits
+    result |= (result << 32);
 
-		newArray[31 - i] = second;
-		newArray[30 - i] = first;
-		
-	}
-	for (auto j = 0; j < 32; j++) {
-		newArray[32 + j] = newArray[j];
-	}
-
-	std::memcpy(&result, &newArray, 64);
-
-	return result;
+    return result;
 }
 
 // task 1 c)
-[[nodiscard]] Algorithm::EncryptionScheme decode(std::uint64_t i){
-	Algorithm::EncryptionScheme enScheme = Algorithm::EncryptionScheme{};
-	auto copyArray = Algorithm::bit{};
-	auto firstBit = 0;
-	auto secondBit = 0;
-	int indexScheme = 0;
+/** decode function **/
+EncryptionScheme decode (std::uint64_t decodeValue) {
+    // Check the form
+    if ((decodeValue & 0xFFFFFFFF) != ((decodeValue >> 32) & 0xFFFFFFFF)) {
+        throw std::exception();
+    }
 
-	// copy i to copyArray
-	for (auto n = 63; n > 0; i--) {
-		copyArray[n] = (i >> i) & 1; 
-	}
+    EncryptionScheme result;
 
-	// compare index 0-31 and 32-63
-	for(auto j=0; j<32 ; j++){
-		if (copyArray[i] != copyArray[i + 32])
-			throw std::exception{};
-	}
+    // Loop through each steps in scheme
+    for (auto i=0; i<result.size(); i++){
+        // Extract bits
+        std::uint64_t bits = (decodeValue >> (i*2)) & 0b11;
 
-	// fill EncryptionSCheme with associated values
-	for (auto k = 0; k < 64; k=k+2) {
-		firstBit = copyArray[k];
-		secondBit = copyArray[k + 1];
+        // Translate bits into EncryptionSteps
+        switch (bits) {
+            case 0b00: result[i] = E; break;
+            case 0b01: result[i] = D; break;
+            case 0b10: result[i] = K; break;
+            case 0b11: result[i] = T; break;
+            default: throw std::exception();
+        }
+    }
 
-		if (firstBit == 0 && secondBit == 0 ) {
-			enScheme[indexScheme] = EncryptionStep::E;
-		}
-		if (firstBit == 0 && secondBit == 1 ) {
-			enScheme[indexScheme] = EncryptionStep::D;
-		}
-		if (firstBit == 1 && secondBit == 0 ) {
-			enScheme[indexScheme] = EncryptionStep::K;
-		}
-		else {
-			enScheme[indexScheme] = EncryptionStep::T;
-		}
-		indexScheme++; 
-	}
-	return enScheme;
-
+    return result;
 }
 
 // task 1 d)
-[[nodiscard]] BitmapImage perform_scheme( const BitmapImage& bitmap, const Key::key_type& keytype, Algorithm::EncryptionScheme e_scheme){  // const ?
-	
-	for (auto i = 0; i < 16; i++) {
-		if (e_scheme[i] == EncryptionStep::E)
-			FES::encrypt(bitmap, keytype);
-		if (e_scheme[i] == EncryptionStep::D)
-			FES::decrypt(bitmap, keytype);
-		if (e_scheme[i] == EncryptionStep::T)
-			bitmap.transpose();
-		else
-			Key::produce_new_key(keytype);
+/** perform_scheme function **/
+BitmapImage perform_scheme (BitmapImage image, Key::key_type& encryption_key, const EncryptionScheme scheme){
+    // Iteration over scheme
+    for (auto i=0; i<scheme.size(); i++){
+        switch (scheme[i]) {
+            case E:
+                image = FES::encrypt(image, encryption_key);
+                break;
+            case D:
+                image = FES::descrypt(image, encryption_key);
+                break;
+            case T:
+                image.transpose();
+                break;
+            case K:
+                encryption_key = Key::produce_new_key(encryption_key);
+                break;
+            default: std::exception();
+        }
+    }
 
-	}
+    return image;
 }
