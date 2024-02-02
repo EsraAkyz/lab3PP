@@ -33,3 +33,42 @@ __global__ void grayscale_kernel(const Pixel<std::uint8_t>* const input, Pixel<s
         output[index] = { grayscale, grayscale, grayscale };
     }
 }
+
+
+/** get_grayscale_cuda function **/
+BitmapImage get_grayscale_cuda(const BitmapImage& source){
+    // Get image dimensions
+    unsigned int width = source.get_width();
+    unsigned int height = source.get_height();
+
+    // Output image
+    BitmapImage result(height,width);
+
+    // Pointers for source (input) and result (output) images
+    Pixel<std::uint8_t>* d_source;
+    Pixel<std::uint8_t>* d_result;
+
+    // Allocate memory on the GPU
+    cudaMalloc(&d_source, width * height * sizeof(Pixel<std::uint8_t>));
+    cudaMalloc(&d_result, width * height * sizeof(Pixel<std::uint8_t>));
+
+    // Copy source to GPU
+    cudaMemcpy(d_source, source.get_data(), width * height * sizeof(Pixel<std::uint8_t>), cudaMemcpyHostToDevice);
+
+    // Define block and grid dimensions
+    dim3 blockDim(32, 32);  // From 1c we use 32x32 bits (?)
+    dim3 gridDim((width + blockDim.x - 1) / blockDim.x, (height + blockDim.y - 1) / blockDim.y);
+
+    // Launch the CUDA kernel
+    grayscale_kernel<<<gridDim, blockDim>>>(d_source, d_result, width, height);
+
+    // Copy the result back to the CPU
+    cudaMemcpy(result.get_data(), d_result, width * height * sizeof(Pixel<std::uint8_t>), cudaMemcpyDeviceToHost);
+
+    // Free allocated GPU memory
+    cudaFree(d_source);
+    cudaFree(d_result);
+
+    return result;
+
+}
