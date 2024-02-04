@@ -20,7 +20,7 @@ public:
 	[[nodiscard]] std::uint64_t encode(EncryptionScheme encryptionScheme);
 
 	// task 1 c)
-	[[nodiscard]] EncryptionScheme decode(std::uint64_t i);
+	[[nodiscard]] EncryptionScheme decode(std::uint64_t number);
 
 	// task 1 d)
 	[[nodiscard]] BitmapImage perform_scheme(BitmapImage bmi, Key::key_type keytype, EncryptionScheme e_scheme);

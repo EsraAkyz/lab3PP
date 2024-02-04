@@ -42,8 +42,8 @@
 }
 
 // task 1 c)
-[[nodiscard]] Algorithm::EncryptionScheme decode(std::uint64_t i){
-	Algorithm::EncryptionScheme enScheme = Algorithm::EncryptionScheme{};
+[[nodiscard]] Algorithm::EncryptionScheme decode(std::uint64_t number){
+	/* Algorithm::EncryptionScheme enScheme = Algorithm::EncryptionScheme{};
 	auto copyArray = Algorithm::bit{};
 	auto firstBit = 0;
 	auto secondBit = 0;
@@ -79,22 +79,50 @@
 		}
 		indexScheme++; 
 	}
-	return enScheme;
+	return enScheme;*/
+	//task 1c          000000000000 00000101010101
+	
+		if ((number& 0xFFFFFFFF) != ((number >> 32) & 0xFFFFFFFF)) {
+			throw std::exception();
+		}
 
+		Algorithm::EncryptionScheme scheme{};
+		for (int i = 0; i < scheme.size(); i++) {
+			std::uint64_t bitPair = (number >> (i * 2)) & 0b11;
+			switch (bitPair)
+			{
+			case 0b00:
+				scheme[i] = EncryptionStep::E;
+				break;
+			case 0b01:
+				scheme[i] = EncryptionStep::D;
+				break;
+			case 0b10:
+				scheme[i] = EncryptionStep::K;
+				break;
+			case 0b11:
+				scheme[i] = EncryptionStep::T;
+				break;
+			}
+		}
+		return scheme;
+	
 }
 
 // task 1 d)
-[[nodiscard]] BitmapImage perform_scheme( const BitmapImage& bitmap, const Key::key_type& keytype, Algorithm::EncryptionScheme e_scheme){  // const ?
+[[nodiscard]] BitmapImage perform_scheme( BitmapImage bitmap, Key::key_type keytype, Algorithm::EncryptionScheme e_scheme){ 
 	
 	for (auto i = 0; i < 16; i++) {
 		if (e_scheme[i] == EncryptionStep::E)
-			FES::encrypt(bitmap, keytype);
+			bitmap = FES::encrypt(bitmap, keytype);
 		if (e_scheme[i] == EncryptionStep::D)
-			FES::decrypt(bitmap, keytype);
+			bitmap= FES::decrypt(bitmap, keytype);
 		if (e_scheme[i] == EncryptionStep::T)
-			bitmap.transpose();
+			bitmap =bitmap.transpose();
+		if (e_scheme[i] == EncryptionStep::K)
+			keytype = Key::produce_new_key(keytype);
 		else
-			Key::produce_new_key(keytype);
-
+			return;
 	}
+	return bitmap;
 }

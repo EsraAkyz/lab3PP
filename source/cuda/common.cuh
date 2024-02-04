@@ -34,6 +34,6 @@ __device__ T1 atomicAdd(T1* x, T1 y);
 
 // task 2 a)
 
-inline [[nodiscard]] unsigned int divup(unsigned int numThreads, unsigned int threadsPerBlock){         // ohne class? in .cuh implementieren?
-	return numThreads / threadsPerBlock;
+inline [[nodiscard]] unsigned int divup(unsigned int numThreads, unsigned int threadsPerBlock){      
+	return (numThreads+ threadsPerBlock -1) / threadsPerBlock;
 }
