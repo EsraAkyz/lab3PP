@@ -25,4 +25,9 @@ public:
 	// task 1 d)
 	[[nodiscard]] BitmapImage perform_scheme(BitmapImage bmi, Key::key_type keytype, EncryptionScheme e_scheme);
 
+	// 3 e)
+	[[nodiscard]] EncryptionScheme retrieve_scheme(std::uint64_t c); 
+
+
 };
+

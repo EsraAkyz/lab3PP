@@ -2,41 +2,26 @@
 #include "FES.h"
 
 // task 1 b)
-[[nodiscard]] std::uint64_t encode(Algorithm::EncryptionScheme encryptionScheme) {
-
-	auto first = 0;
-	auto second = 0; 
-	std::uint64_t result; 
-	std::vector<int> values;
-	auto newArray = Algorithm::bit{};
-
-	for (auto i = 0; i < 31; i=i+2) {
-		if (encryptionScheme[i] == EncryptionStep::E) {
-			first = 0;
-			second = 0;
+/** encode function **/
+std::uint64_t encode(const Algorithm::EncryptionScheme& scheme) {
+	std::uint64_t result = 0;
+	std::uint64_t bits;
+	// Loop through each step in the scheme
+	for (auto i = 0; i < scheme.size(); i++) {
+		// Translate EncryptionStep into bits
+		switch (scheme[i]) {
+			case EncryptionStep::E: bits = 0b00; break;
+			case EncryptionStep::D: bits = 0b01; break;
+			case EncryptionStep::K: bits = 0b10; break;
+			case EncryptionStep::T: bits = 0b11; break;
+			default: bits = 0; // Handle potential errors
 		}
-		if (encryptionScheme[i] == EncryptionStep::D) {
-			first = 0;
-			second = 1;
-		}
-		if (encryptionScheme[i] == EncryptionStep::K) {
-			first = 1;
-			second = 0;
-		}
-		else {
-			first = 1;
-			second = 1;
-		}
-
-		newArray[31 - i] = second;
-		newArray[30 - i] = first;
-		
-	}
-	for (auto j = 0; j < 32; j++) {
-		newArray[32 + j] = newArray[j];
+		// Arrange bits in std::uint64_t
+		result |= (bits << (i * 2));
 	}
 
-	std::memcpy(&result, &newArray, 64);
+	// Replicate the 32 lower bits into the 32 upper bits
+	result |= (result << 32);
 
 	return result;
 }
@@ -80,7 +65,7 @@
 		indexScheme++; 
 	}
 	return enScheme;*/
-	//task 1c          000000000000 00000101010101
+	//task 1c          
 	
 		if ((number& 0xFFFFFFFF) != ((number >> 32) & 0xFFFFFFFF)) {
 			throw std::exception();
@@ -121,8 +106,45 @@
 			bitmap =bitmap.transpose();
 		if (e_scheme[i] == EncryptionStep::K)
 			keytype = Key::produce_new_key(keytype);
-		else
-			return;
 	}
 	return bitmap;
+}
+
+// 3 e)
+[[nodiscard]] Algorithm::EncryptionScheme retrieve_scheme(std::uint64_t c) {
+	Algorithm::EncryptionScheme result;
+	/*
+	// Iterate over all possible scheme
+	   // 1ULL is the integer literal 1 (ULL stands for "Unsigned Long Long"), represented as an unsigned 64-bit integer
+	   // (1ULL << 20) equals 2^20
+	for (auto i = std::uint64_t(0); i < (1ULL << 20); i++) {
+		Algorithm::EncryptionScheme es = Algorithm::decode(c);
+		std::uint64_t encoded_scheme = encode();
+
+		// Check if the hash matches encoded scheme
+		if (c == encoded_scheme) {
+			result = decode(i);
+
+			// Get standard key for first encryption
+			Key::key_type encryption_key = Key::get_standard_key();
+			BitmapImage image();
+			BitmapImage* p = nullptr;
+
+			int step = 0;
+			// First 10 steps
+			while (step < 10) {
+				image = perform_scheme(image, encryption_key, encoded_scheme);
+				step++;
+			}
+
+			// Next 6 steps
+			while (step < 16) {
+				encode(decoded_scheme[step]);
+				step++;
+			}
+
+			break;
+		}
+	} */
+	return result;
 }

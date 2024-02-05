@@ -74,11 +74,12 @@ BitmapImage get_grayscale_cuda(const BitmapImage& source) {
 	cudaMemcpy(d_source, source.get_data(), width * height * sizeof(Pixel<std::uint8_t>), cudaMemcpyHostToDevice);
 
 	// Define block and grid dimensions
-	dim3 blockDim(32, 32);  // From 1c we use 32x32 bits (?)
+	dim3 blockDim(32);  // From 1c we use 32x32 bits (?)
 	dim3 gridDim((width + blockDim.x - 1) / blockDim.x, (height + blockDim.y - 1) / blockDim.y);
 
+
 	// Launch the CUDA kernel
-	grayscale_kernel<<< gridDim, blockDim>>>(d_source, d_result, width, height);                                       // korrigieren  
+	grayscale_kernel<<<gridDim, blockDim>>>(d_source, d_result, width, height);                                       // korrigieren  
 
 	// Copy the result back to the CPU
 	cudaMemcpy(result.get_data(), d_result, width * height * sizeof(Pixel<std::uint8_t>), cudaMemcpyDeviceToHost);

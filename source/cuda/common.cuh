@@ -27,10 +27,10 @@ __device__ T1 atomicAdd(T1* x, T1 y);
 #endif
 
 #define GRAYSCALE_SHARED_MEM 0
-#define HASH_SHARED_MEM 0
-#define FLAT_HASH_SHARED_MEM 0
-#define FIND_HASH_SHARED_MEM 0
-#define HASH_SCHEMES_SHARED_MEM 0
+#define HASH_SHARED_MEM 256
+#define FLAT_HASH_SHARED_MEM 256
+#define FIND_HASH_SHARED_MEM 256
+#define HASH_SCHEMES_SHARED_MEM 256
 
 // task 2 a)
 
