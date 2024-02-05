@@ -1,6 +1,7 @@
 #include "encryption.cuh"
 #include "util/Hash.h"
 #include "util/SharedMemory.h"
+#include "Algorithm.h"
 
 #include <cooperative_groups.h>
 #include <cuda.h>
@@ -82,3 +83,33 @@ __global__ void find_hash(const std::uint64_t* const hashes, unsigned int* const
         }
     }
 }
+
+
+/** Kernel for hash_scheme **/
+#define HASH_SCHEMES_SHARED_MEM 128
+__global__ void hash_schemes(std::uint64_t* const hashes, const unsigned int length){
+    // Declare shared memory
+    __shared__ std::uint64_t shared_hashes[HASH_SCHEMES_SHARED_MEM];
+
+    // Calculate the global index of the current thread
+    unsigned int index = blockIdx.x * blockDim.x + threadIdx.x;
+
+    // Check if thread within length
+    if (index < length){
+        // Convert index to an EncryptionScheme
+        EncryptionScheme scheme = decode(index);
+
+        // Convert EncryptionScheme to a std::uint64_t value for hashing
+        std::uint64_t combined_scheme = encode(scheme);
+
+        // Hash value for combined scheme
+        shared_hashes[threadIdx.x] = Hash::hash(combined_scheme);
+
+        // Ensure all threads have finished calculating hashes
+        __syncthreads();
+
+        // Copy shared hashes to global memory
+        hashes[index] = shared_hashes[threadIdx.x];
+    }
+}
+
