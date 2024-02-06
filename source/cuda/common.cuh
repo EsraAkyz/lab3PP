@@ -27,13 +27,13 @@ __device__ T1 atomicAdd(T1* x, T1 y);
 #endif
 
 #define GRAYSCALE_SHARED_MEM 0
-#define HASH_SHARED_MEM 0
-#define FLAT_HASH_SHARED_MEM 0
-#define FIND_HASH_SHARED_MEM 0
-#define HASH_SCHEMES_SHARED_MEM 0
+#define HASH_SHARED_MEM 256
+#define FLAT_HASH_SHARED_MEM 256
+#define FIND_HASH_SHARED_MEM 256
+#define HASH_SCHEMES_SHARED_MEM 256
 
-// task 2 a)
+//task 2a
+inline __host__ __device__ unsigned int divup(unsigned int dividend, unsigned int divisor) {
+	return (dividend + divisor - 1) / divisor;
+};
 
-[[nodiscard]] unsigned int divup(unsigned int numThreads, unsigned int threadsPerBlock){                       // ohne class? in .cuh implementieren?
-	return numThreads / threadsPerBlock;
-}
