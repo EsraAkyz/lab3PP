@@ -1,4 +1,5 @@
 #pragma once
+#include "cuda/common.cuh"
 
 enum class ChannelOrder {
 	BGR,
@@ -16,21 +17,21 @@ public:
 
 	static ChannelOrder channel_order;
 
-	Pixel() noexcept = default;
+	__device__ Pixel() noexcept = default;
 
-	Pixel(const channel_type red, const channel_type green, const channel_type blue) noexcept
+	__device__ Pixel(const channel_type red, const channel_type green, const channel_type blue) noexcept
 		: red_channel{ red }, green_channel{ green }, blue_channel{ blue } {
 	}
 
-	[[nodiscard]] channel_type get_red_channel() const noexcept {
+	[[nodiscard]] __device__ channel_type get_red_channel() const noexcept {
 		return red_channel;
 	}
 
-	[[nodiscard]] channel_type get_green_channel() const noexcept {
+	 [[nodiscard]] __device__ channel_type get_green_channel() const noexcept {
 		return green_channel;
 	}
 
-	[[nodiscard]] channel_type get_blue_channel() const noexcept {
+	 [[nodiscard]] __device__ channel_type get_blue_channel() const noexcept {
 		return blue_channel;
 	}
 

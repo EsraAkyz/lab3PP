@@ -11,9 +11,8 @@ enum class EncryptionStep {
 	T
 };
 
-class Algorithm {
-public: 
-	using EncryptionScheme = std::array<EncryptionStep, 16>;
+using EncryptionScheme = std::array<EncryptionStep, 16>;
+
 	using bit = std::array<int, 64>;
 
 	// task 1 b)
@@ -26,8 +25,4 @@ public:
 	[[nodiscard]] BitmapImage perform_scheme(BitmapImage bmi, Key::key_type keytype, EncryptionScheme e_scheme);
 
 	// 3 e)
-	[[nodiscard]] EncryptionScheme retrieve_scheme(std::uint64_t c); 
-
-
-};
-
+	[[nodiscard]] EncryptionScheme retrieve_scheme(std::uint64_t c);

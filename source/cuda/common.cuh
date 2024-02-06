@@ -32,8 +32,8 @@ __device__ T1 atomicAdd(T1* x, T1 y);
 #define FIND_HASH_SHARED_MEM 256
 #define HASH_SCHEMES_SHARED_MEM 256
 
-// task 2 a)
+//task 2a
+inline __host__ __device__ unsigned int divup(unsigned int dividend, unsigned int divisor) {
+	return (dividend + divisor - 1) / divisor;
+};
 
-inline [[nodiscard]] unsigned int divup(unsigned int numThreads, unsigned int threadsPerBlock){      
-	return (numThreads+ threadsPerBlock -1) / threadsPerBlock;
-}
